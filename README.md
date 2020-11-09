@@ -9,8 +9,14 @@
 status](https://github.com/mcgirjau/ucdp/workflows/R-CMD-check/badge.svg)](https://github.com/mcgirjau/ucdp/actions)
 <!-- badges: end -->
 
-R data package for the [Uppsala Conflict Data
-Program](https://ucdp.uu.se/downloads/)
+An R data package for the [Uppsala Conflict Data
+Program](https://ucdp.uu.se/downloads/), containing the Georeferenced
+Event Dataset (GED) Global version 20.1. This dataset is UCDP’s most
+disaggregated dataset, covering individual events of organized violence
+(phenomena of lethal violence occurring at a given time and place).
+These events are sufficiently fine-grained to be geo-coded down to the
+level of individual villages, with temporal durations disaggregated to
+single, individual days.
 
 ## Installation
 
@@ -40,7 +46,15 @@ data("GED")
 ## Examples
 
 The following are some examples of questions that the Georeferenced
-Event Dataset may help investigate.
+Event Dataset may help investigate. Load these additional packages to
+try out the examples:
+
+``` r
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(tidyr)
+```
 
 ### How does the number of total conflict fatalities vary from 1989 to 2019?
 
@@ -48,11 +62,6 @@ Let’s make a time series plot to visualize how the number of total
 deaths varies by year.
 
 ``` r
-library(dplyr)
-library(ggplot2)
-library(kableExtra)
-library(tidyr)
-
 GED %>%
   group_by(year) %>% 
   summarize(total_deaths = sum(best)) %>% 
@@ -61,7 +70,7 @@ GED %>%
   labs(x = "Year", y = "Total Deaths", title = "Total Deaths by Year")
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" />
 
 Notice the very dramatic peak in total fatalities around 1994. Was that
 a tumultuous year for the entire world, or was there a single event that
@@ -78,7 +87,7 @@ GED %>%
   theme(legend.position = "bottom")
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" />
 
 Seems like the 1994 peak in total fatalities was due to some African
 conflict. By comparison, that same year was relatively non-lethal for
@@ -101,204 +110,21 @@ GED %>%
   summarize(total_deaths = sum(best)) %>% 
   arrange(desc(total_deaths)) %>%
   head(10) %>%
-  kable(col.names = c("Country", "Total Fatalities"),
-        caption = "Top 10 Countries by Total Conflict Fatalities from 1989 to 2019") %>%
-  kable_styling(latex_options = c("striped", "HOLD_position"))
+  kable(col.names = c("Country", "Total Fatalities"))
 ```
 
-<table class="table" style="margin-left: auto; margin-right: auto;">
-
-<caption>
-
-Top 10 Countries by Total Conflict Fatalities from 1989 to 2019
-
-</caption>
-
-<thead>
-
-<tr>
-
-<th style="text-align:left;">
-
-Country
-
-</th>
-
-<th style="text-align:right;">
-
-Total Fatalities
-
-</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr>
-
-<td style="text-align:left;">
-
-Rwanda
-
-</td>
-
-<td style="text-align:right;">
-
-543176
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Syria
-
-</td>
-
-<td style="text-align:right;">
-
-359843
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Afghanistan
-
-</td>
-
-<td style="text-align:right;">
-
-257944
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Ethiopia
-
-</td>
-
-<td style="text-align:right;">
-
-178169
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Iraq
-
-</td>
-
-<td style="text-align:right;">
-
-121659
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-DR Congo (Zaire)
-
-</td>
-
-<td style="text-align:right;">
-
-114859
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Sudan
-
-</td>
-
-<td style="text-align:right;">
-
-93128
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Sri Lanka
-
-</td>
-
-<td style="text-align:right;">
-
-65628
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Nigeria
-
-</td>
-
-<td style="text-align:right;">
-
-57032
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-India
-
-</td>
-
-<td style="text-align:right;">
-
-56716
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
+| Country          | Total Fatalities |
+| :--------------- | ---------------: |
+| Rwanda           |           543176 |
+| Syria            |           359843 |
+| Afghanistan      |           257944 |
+| Ethiopia         |           178169 |
+| Iraq             |           121659 |
+| DR Congo (Zaire) |           114859 |
+| Sudan            |            93128 |
+| Sri Lanka        |            65628 |
+| Nigeria          |            57032 |
+| India            |            56716 |
 
 ### What were the deadliest conflicts in each region from 1989 to 2019?
 
@@ -307,160 +133,16 @@ GED %>%
   group_by(region, conflict_name) %>% 
   summarize(total_deaths = sum(best)) %>% 
   slice_max(order_by = total_deaths, n = 1) %>%
-  kable(col.names = c("Region", "Conflict", "Total Fatalities"),
-        caption = "Most Lethal Conflict by Region") %>%
-  kable_styling(latex_options = c("striped", "HOLD_position"))
+  kable(col.names = c("Region", "Conflict", "Total Fatalities"))
 ```
 
-<table class="table" style="margin-left: auto; margin-right: auto;">
-
-<caption>
-
-Most Lethal Conflict by Region
-
-</caption>
-
-<thead>
-
-<tr>
-
-<th style="text-align:left;">
-
-Region
-
-</th>
-
-<th style="text-align:left;">
-
-Conflict
-
-</th>
-
-<th style="text-align:right;">
-
-Total Fatalities
-
-</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr>
-
-<td style="text-align:left;">
-
-Africa
-
-</td>
-
-<td style="text-align:left;">
-
-Government of Rwanda - Civilians
-
-</td>
-
-<td style="text-align:right;">
-
-534213
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Americas
-
-</td>
-
-<td style="text-align:left;">
-
-Colombia: Government
-
-</td>
-
-<td style="text-align:right;">
-
-19954
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Asia
-
-</td>
-
-<td style="text-align:left;">
-
-Afghanistan: Government
-
-</td>
-
-<td style="text-align:right;">
-
-229878
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Europe
-
-</td>
-
-<td style="text-align:left;">
-
-Russia (Soviet Union): Chechnya
-
-</td>
-
-<td style="text-align:right;">
-
-18196
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Middle East
-
-</td>
-
-<td style="text-align:left;">
-
-Syria: Government
-
-</td>
-
-<td style="text-align:right;">
-
-251210
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
+| Region      | Conflict                         | Total Fatalities |
+| :---------- | :------------------------------- | ---------------: |
+| Africa      | Government of Rwanda - Civilians |           534213 |
+| Americas    | Colombia: Government             |            19954 |
+| Asia        | Afghanistan: Government          |           229878 |
+| Europe      | Russia (Soviet Union): Chechnya  |            18196 |
+| Middle East | Syria: Government                |           251210 |
 
 ### What were the most intentionally-lethal actors (i.e. actors not targetting civilians) on the world stage from 1989 to 2019?
 
@@ -473,201 +155,18 @@ GED %>%
   summarize(total_deaths_inflicted = sum(deaths_inflicted)) %>% 
   arrange(desc(total_deaths_inflicted)) %>%
   head(10) %>%
-  kable(col.names = c("Actor", "Total Deaths Inflicted"),
-        caption = "Top 10 Actors by Most Deaths Inflicted from 1989 to 2019") %>%
-  kable_styling(latex_options = c("striped", "HOLD_position"))
+  kable(col.names = c("Actor", "Total Deaths Inflicted"))
 ```
 
-<table class="table" style="margin-left: auto; margin-right: auto;">
-
-<caption>
-
-Top 10 Actors by Most Deaths Inflicted from 1989 to 2019
-
-</caption>
-
-<thead>
-
-<tr>
-
-<th style="text-align:left;">
-
-Actor
-
-</th>
-
-<th style="text-align:right;">
-
-Total Deaths Inflicted
-
-</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr>
-
-<td style="text-align:left;">
-
-Government of Afghanistan
-
-</td>
-
-<td style="text-align:right;">
-
-136781
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Syrian insurgents
-
-</td>
-
-<td style="text-align:right;">
-
-102555
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Government of Syria
-
-</td>
-
-<td style="text-align:right;">
-
-85091
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-IS
-
-</td>
-
-<td style="text-align:right;">
-
-47671
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Government of Iraq
-
-</td>
-
-<td style="text-align:right;">
-
-45135
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-EPLF
-
-</td>
-
-<td style="text-align:right;">
-
-42900
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-EPRDF
-
-</td>
-
-<td style="text-align:right;">
-
-39893
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Government of Sri Lanka
-
-</td>
-
-<td style="text-align:right;">
-
-37831
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Taleban
-
-</td>
-
-<td style="text-align:right;">
-
-34561
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Government of Turkey
-
-</td>
-
-<td style="text-align:right;">
-
-25461
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
+| Actor                     | Total Deaths Inflicted |
+| :------------------------ | ---------------------: |
+| Government of Afghanistan |                 136781 |
+| Syrian insurgents         |                 102555 |
+| Government of Syria       |                  85091 |
+| IS                        |                  47671 |
+| Government of Iraq        |                  45135 |
+| EPLF                      |                  42900 |
+| EPRDF                     |                  39893 |
+| Government of Sri Lanka   |                  37831 |
+| Taleban                   |                  34561 |
+| Government of Turkey      |                  25461 |
