@@ -1,0 +1,16 @@
+Package: ucdp
+Title: Data package for the Uppsala Conflict Data Program
+Version: 0.1.0
+Authors@R: 
+    person(given = "Maria-Cristiana",
+           family = "Gîrjău",
+           role = c("aut", "cre"),
+           email = "mgirjau21@amherst.edu")
+Description: This package holds all available datasets issued by the Uppsala Conflict Data Program.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
+Depends: 
+    R (>= 2.10)
